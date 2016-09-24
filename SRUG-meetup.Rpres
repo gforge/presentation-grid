@@ -1,0 +1,244 @@
+SRGUG meetup - the grid pacakge
+
+The awesome grid package
+========================================================
+author: Max Gordon
+date: 2016-09-28
+autosize: true
+<style>
+.small-code pre code {
+  font-size: 1em;
+}
+</style>
+
+What is the `grid` pacakge?
+========================================================
+
+```{r setup, include=FALSE}
+opts_chunk$set(cache=TRUE)
+```
+
+Author: Paul Murrell
+Part of the 14 base pacakges.
+
+> Grid graphics provides an alternative to the standard R graphics. The user is able to define arbitrary rectangular regions (called viewports) on the graphics device and define a number of coordinate systems for each region. Drawing can be specified to occur in any viewport using any of the available coordinate systems.
+
+***
+
+![Where is grid?](imgs/grid-pkgs.svg)
+
+
+What makes `grid` great?
+========================================================
+
+&nbsp;
+
+- Perfect control over the over ouptut
+- Your imagination sets the limit
+- Code professional infographics
+
+***
+
+```{r echo=FALSE}
+library(Gmisc)
+# Transitions
+set.seed(1)
+n <- 10
+my_data <-
+  data.frame(
+    Var_a = sample(c("Group A",
+                     "Group B",
+                     "Group C"),
+                   size = n,
+                   replace = TRUE,
+                   prob = 3:1),
+    Var_b = sample(c("Group A",
+                     "Group B",
+                     "Group C"),
+                   size = n,
+                   replace = TRUE,
+                   prob = 1:3))
+mtrx <- with(my_data,
+             table(Var_a, Var_b))
+
+# Initialize the transition plot
+transitions <-
+  getRefClass("Transition")$new(mtrx, label=c("Before", "After"))
+
+# Render the plot
+transitions$render()
+```
+
+Basics
+========================================================
+class: small-code
+
+Everything is arranged around viewports. A viewport has:
+
+- x/y position
+- width/height
+- encapsulation
+
+```{r basic_plot, eval=FALSE, echo=TRUE}
+library(grid)
+grid.newpage()
+pushViewport(viewport(x=.6, y=.5, width=.6, height=.6))
+grid.rect(gp = gpar(fill="steelblue"))
+grid.rect(width=unit(2, "cm"), height=unit(2, "cm"), 
+          x=0, y=0, just=c(0,0),
+          gp = gpar(fill="lightyellow"))
+grid.rect(width=unit(2, "cm"), height=unit(2, "cm"), 
+          x=1, y=1, just=c(1,1),
+          gp = gpar(fill="yellow"))
+upViewport()
+```
+
+*** 
+
+```{r, ref.label="basic_plot", eval=TRUE, echo=FALSE}
+```
+
+
+Viewports 4 subelements - why?
+========================================================
+class: small-code
+
+Adding text to boxes without viewports:
+
+```{r basic_w_txt, echo=TRUE, eval=FALSE}
+library(grid)
+grid.newpage()
+pushViewport(viewport(x=.5, y=.5, width=.9, height=.9))
+grid.rect(gp = gpar(fill="steelblue"))
+grid.rect(width=unit(2, "cm"), height=unit(2, "cm"), 
+          x=0, y=0, just=c(0,0),
+          gp = gpar(fill="lightyellow"))
+grid.text("BL", 
+          x=unit(1, "cm"), 
+          y=unit(1, "cm"))
+grid.rect(width=unit(2, "cm"), height=unit(2, "cm"), 
+          x=1, y=1, just=c(1,1),
+          gp = gpar(fill="yellow"))
+grid.text("TR", 
+          x=unit(1, "npc") - unit(1, "cm"), 
+          y=unit(1, "npc") - unit(1, "cm"))
+upViewport()
+```
+
+***
+
+```{r output, ref.label='basic_w_txt', echo=FALSE, eval=TRUE}
+```
+
+### What about:
+
+* Resizing?
+* Component isolation?
+
+Viewports 4 subelements - how?
+========================================================
+
+Adding text to boxes with viewports:
+
+```{r basic_w_txt_and_vp, echo=TRUE, eval=FALSE}
+library(grid)
+grid.newpage()
+pushViewport(viewport(x=.5, y=.5, width=.9, height=.9))
+grid.rect(gp = gpar(fill="steelblue"))
+
+pushViewport(
+  viewport(x=0, y=0, 
+           width=unit(2, "cm"), height=unit(2, "cm"),
+           just=c(0,0)))
+grid.rect(gp = gpar(fill="lightyellow"))
+grid.text("BL")
+upViewport()
+
+pushViewport(
+  viewport(x=1, y=1, 
+           width=unit(2, "cm"), height=unit(2, "cm"),
+           just=c(1,1)))
+grid.rect(gp = gpar(fill="yellow"))
+grid.text("TR")
+upViewport()
+upViewport()
+```
+
+***
+
+```{r, ref.label="basic_w_txt_and_vp", eval=TRUE, echo=FALSE}
+
+```
+
+Viewports allow encapsulating
+========================================================
+class: small-code
+
+```{r basic_encaps, echo=TRUE, eval=FALSE}
+box <- function(box_label,
+                x, y, height, width,
+                just) {
+  pushViewport(
+    viewport(x=x, y=y, 
+             width=width, height,
+             just=just))
+  
+  grid.rect(gp = gpar(fill="lightyellow"))
+  grid.text(box_label)
+  upViewport()
+}
+
+library(grid)
+grid.newpage()
+pushViewport(viewport(x=.5, y=.5, width=.9, height=.9))
+grid.rect(gp = gpar(fill="steelblue"))
+
+box("BL",
+    x=0, y=0, 
+    width=unit(2, "cm"), height=unit(2, "cm"),
+    just=c(0,0))
+box("TR",
+    x=1, y=1, 
+    width=unit(2, "cm"), height=unit(2, "cm"),
+    just=c(1,1))
+
+upViewport()
+```
+
+***
+
+```{r, ref.label="basic_encaps", eval=TRUE, echo=FALSE}
+```
+
+
+Encapsulating side benefits
+========================================================
+class: small-code
+
+```{r encaps_side, echo=TRUE, eval=FALSE}
+boxFancy <- function(box_label,
+                x, y, height, width,
+                just) {
+  pushViewport(
+    viewport(x=x, y=y, 
+             width=width, height,
+             just=just))
+  
+  grid.rect(gp = gpar(fill="lightyellow"))
+  grid.text(box_label,
+             gp=gpar(cex=5))
+  upViewport()
+}
+
+library(grid)
+grid.newpage()
+box("Some random text",
+    x=0.5, y=0.5, 
+    width=unit(.8, "npc"), height=unit(.8, "npc"),
+    just=c(0.5,0.5))
+```
+
+***
+
+```{r, ref.label="encaps_side", eval=TRUE, echo=FALSE}
+```
