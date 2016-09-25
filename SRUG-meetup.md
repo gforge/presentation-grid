@@ -1,20 +1,54 @@
-SRGUG meetup - the grid pacakge
-
-The awesome grid package
+The grid package
 ========================================================
-author: Max Gordon
-date: 2016-09-28
 autosize: true
+
 <style>
 .small-code pre code {
   font-size: 1em;
 }
+.tiny-code pre code {
+  font-size: .7em;
+}
+.reveal blockquote {
+  font-size: .8em;
+}
+.small-text p,  .small-text ul {
+  font-size: .8em;
+  margin-bottom: 10px;
+}
+
+.small-text li {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.small-text pre code {
+  font-size: 1em;
+}
+
+.footer {
+    color: black;
+    background: #E8E8E8;
+    position: fixed;
+    top: 90%;
+    text-align:center;
+    width:100%;
+}
+.midcenter {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+}
+
 </style>
+
+
+
+
+<img src="SRUG-meetup-figure/digitalRain-1.png" title="plot of chunk digitalRain" alt="plot of chunk digitalRain" width="1600px" height="600px" />
 
 What is the `grid` pacakge?
 ========================================================
-
-
 
 Author: Paul Murrell
 Part of the 14 base pacakges.
@@ -41,7 +75,7 @@ What makes `grid` great?
 
 Basics
 ========================================================
-class: small-code
+class: small-text
 
 Everything is arranged around viewports. A viewport has:
 
@@ -71,13 +105,12 @@ upViewport()
 
 Viewports 4 subelements - why?
 ========================================================
-class: small-code
+class: small-text
 
 Adding text to boxes without viewports:
 
 
 ```r
-library(grid)
 grid.newpage()
 pushViewport(viewport(x=.5, y=.5, width=.9, height=.9))
 grid.rect(gp = gpar(fill="steelblue"))
@@ -107,12 +140,12 @@ upViewport()
 
 Viewports 4 subelements - how?
 ========================================================
+class: small-text
 
 Adding text to boxes with viewports:
 
 
 ```r
-library(grid)
 grid.newpage()
 pushViewport(viewport(x=.5, y=.5, width=.9, height=.9))
 grid.rect(gp = gpar(fill="steelblue"))
@@ -141,7 +174,7 @@ upViewport()
 
 Viewports allow encapsulating
 ========================================================
-class: small-code
+class: tiny-code
 
 
 ```r
@@ -182,13 +215,13 @@ upViewport()
 
 Encapsulating side benefits
 ========================================================
-class: small-code
+class: tiny-code
 
 
 ```r
 boxFancy <- function(box_label,
-                x, y, height, width,
-                just) {
+                     x, y, height, width,
+                     just) {
   pushViewport(
     viewport(x=x, y=y, 
              width=width, height,
@@ -196,18 +229,216 @@ boxFancy <- function(box_label,
   
   grid.rect(gp = gpar(fill="lightyellow"))
   grid.text(box_label,
-             gp=gpar(cex=5))
+            gp=gpar(cex=3))
+  width = convertUnit(unit(1, "npc"), "cm")
+  pushViewport(viewport(x = 0, y=0, just=c(0,0), 
+                        width=.5, clip="on"))
+  grid.rect(gp=gpar(fill="yellow", col=NA))
+  grid.text(box_label, 
+            gp=gpar(cex=3, col="red"),
+            vp=viewport(width = width, x=0,y=0, 
+                        just=c(0,0)))
+  upViewport()
+  grid.rect(gp = gpar(fill=NA))
   upViewport()
 }
 
 library(grid)
 grid.newpage()
-box("Some random text",
-    x=0.5, y=0.5, 
-    width=unit(.8, "npc"), height=unit(.8, "npc"),
-    just=c(0.5,0.5))
+boxFancy("Some random text",
+         x=0.5, y=0.5, 
+         width=unit(.8, "npc"), height=unit(.8, "npc"),
+         just=c(0.5,0.5))
 ```
 
 ***
 
 ![plot of chunk unnamed-chunk-5](SRUG-meetup-figure/unnamed-chunk-5-1.png)
+
+Core parts 4 a flowchart
+========================================================
+class: small-code
+
+
+```r
+library(Gmisc)
+grid.newpage()
+pushViewport(vp = viewport(gp = gpar(cex = 2)))
+box <- list(
+  boxGrob("This box autosizes to the\ntext within", 
+          y=unit(.95, "npc"), bjust="top"),
+  boxPropGrob("This box can show a porportion", 
+              label_left = "Left",
+              label_right = "Right",
+              prop=.3,
+              y=unit(0.05, "npc"), bjust="bottom"))
+lapply(box, grid.draw)
+```
+
+***
+
+![plot of chunk unnamed-chunk-6](SRUG-meetup-figure/unnamed-chunk-6-1.png)
+
+Core parts 4 a flowchart - positions
+========================================================
+class: small-code
+
+
+```r
+grid.newpage()
+pushViewport(vp = viewport(gp = gpar(cex = 2)))
+lapply(box, grid.draw)
+draw_coords <- function(box)
+  with(attr(box, "coords"), {
+    grd_circ <- function(x,y,fill)
+      grid.circle(x=x, y=y, gp=gpar(fill=fill),
+                  r=unit(2, "mm"))
+    grd_circ(x=x, y=y, "black")
+    grd_circ(x=x, y=top, "yellow")
+    grd_circ(x=x, y=bottom, "yellow")
+    grd_circ(x=left, y=y, "orange")
+    grd_circ(x=right, y=y, "orange")
+    if ("left_x" %in% ls()) {
+      grd_circ(x=left_x, y=top, "blue")
+      grd_circ(x=left_x, y=bottom, "blue")
+      grd_circ(x=right_x, y=top, "purple")
+      grd_circ(x=right_x, y=bottom, "purple")
+    }
+  })
+lapply(box, draw_coords)
+```
+
+***
+
+![plot of chunk unnamed-chunk-7](SRUG-meetup-figure/unnamed-chunk-7-1.png)
+
+
+flowchart - connect
+========================================================
+class: small-code
+
+
+```r
+grid.newpage()
+pushViewport(
+  vp=viewport(gp=gpar(cex=2)))
+
+lapply(box, grid.draw)
+lapply(box, draw_coords)
+
+connectGrob(start=box[[1]], 
+            end=box[[2]],
+            type="v")
+```
+
+***
+
+![plot of chunk unnamed-chunk-8](SRUG-meetup-figure/unnamed-chunk-8-1.png)
+
+flowchart - connect to prop
+========================================================
+class: small-code
+
+
+```r
+grid.newpage()
+pushViewport(
+  vp=viewport(gp=gpar(cex=2)))
+
+lapply(box, grid.draw)
+lapply(box, draw_coords)
+
+connectGrob(start=box[[1]], 
+            end=box[[2]],
+            type="v", 
+            subelmnt="left")
+
+connectGrob(start=box[[1]], 
+            end=box[[2]],
+            type="v", 
+            subelmnt="right")
+```
+
+***
+
+![plot of chunk unnamed-chunk-9](SRUG-meetup-figure/unnamed-chunk-9-1.png)
+
+
+Finally a flowchart
+========================================================
+class: tiny-code
+
+
+```r
+grid.newpage()
+distance <- unit(.2, "npc")
+boxs <- list()
+boxs$start_pop <- boxGrob("Start pop.\nn = 145 patients", y=1, bjust="top")
+boxs$included <- 
+  boxGrob("Included n = 78 patients", bjust="top",
+          y=attr(boxs$start_pop, "coords")$bottom - distance)
+boxs$excluded <- 
+  boxGrob("Excluded:\n - 40 CHF\n - 7 prev. hist.\n - 20 misc.", 
+          y=attr(boxs$start_pop, "coords")$bottom - unit(.1, "npc"),
+          x=1, bjust="right", just="left")
+boxs$groups <- 
+  boxPropGrob("Randomized", 
+              label_left=sprintf("Treatment\n %d patients",
+                                   round(78*.3)),
+              label_right=sprintf("Control\n %d patients",
+                                    78 - round(78*.3)),
+              prop=.3, bjust="top",
+              y=attr(boxs$included, "coords")$bottom - distance)
+boxs$fup_trtmnt <- 
+  with(attr(boxs$groups, "coords"),
+       boxGrob("Treatment 1 year: \n - 1 patients died",
+               x=left_x,
+               bjust="bottom", y=0))
+boxs$fup_control <- 
+  with(attr(boxs$groups, "coords"),
+       boxGrob("Controls 1 year: \n - 2 patients died",
+               x=right_x,
+               bjust="bottom", y=0))
+lapply(boxs, grid.draw)
+```
+
+***
+
+![plot of chunk unnamed-chunk-10](SRUG-meetup-figure/unnamed-chunk-10-1.png)
+
+Finally a flowchart - connecting the dots
+========================================================
+class: small-code
+
+
+```r
+grid.newpage() 
+lapply(boxs, grid.draw)
+connectGrob(start=boxs$start_pop, end=boxs$included, 
+            type="v")
+connectGrob(start=boxs$start_pop, end=boxs$excluded, 
+            type="L")
+connectGrob(start=boxs$included, end=boxs$groups, 
+            type="v")
+connectGrob(start=boxs$groups, end=boxs$fup_trtmnt, 
+            type="v", subelmnt="left")
+connectGrob(start=boxs$groups, end=boxs$fup_control, 
+            type="v", subelmnt="right")
+```
+
+***
+
+![plot of chunk unnamed-chunk-11](SRUG-meetup-figure/unnamed-chunk-11-1.png)
+
+Summary
+===================================================
+
+* Perfect positioning
+* Encapsulate into grobs
+* Build complexity within viewports
+* Sky is the limit
+
+***
+
+![plot of chunk unnamed-chunk-12](SRUG-meetup-figure/unnamed-chunk-12-1.png)
+

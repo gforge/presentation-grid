@@ -1,22 +1,134 @@
-SRGUG meetup - the grid pacakge
-
-The awesome grid package
+The grid package
 ========================================================
-author: Max Gordon
-date: 2016-09-28
 autosize: true
+
 <style>
 .small-code pre code {
   font-size: 1em;
 }
+.tiny-code pre code {
+  font-size: .7em;
+}
+.reveal blockquote {
+  font-size: .8em;
+}
+.small-text p,  .small-text ul {
+  font-size: .8em;
+  margin-bottom: 10px;
+}
+
+.small-text li {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.small-text pre code {
+  font-size: 1em;
+}
+
+.footer {
+    color: black;
+    background: #E8E8E8;
+    position: fixed;
+    top: 90%;
+    text-align:center;
+    width:100%;
+}
+.midcenter {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+}
+
 </style>
+
+
+```{r setup, include=FALSE, cache=FALSE, echo=FALSE}
+opts_chunk$set(cache=TRUE)
+library(grid)
+library(magrittr)
+```
+
+```{r digitalRain, eval=TRUE, echo=FALSE, fig.height=4, fig.width=8, out.width='1600px', out.height='600px'}
+grid.newpage()
+grid.rect(gp=gpar(fill="black"))
+char_width = 
+  textGrob("0", gp=gpar(fontfamily="mono")) %>% 
+  grobWidth() %>% 
+  convertX("cm", TRUE)
+char_height = 
+  textGrob("0", gp=gpar(fontfamily="mono")) %>% 
+  grobHeight() %>% 
+  convertY("cm", TRUE)
+no_rows <-  unit(1, "npc") %>% 
+  convertY("cm", TRUE)/char_height
+no_cols <-  unit(1, "npc") %>% 
+  convertX("cm", TRUE)/char_width
+no_cols <- round(no_cols * .8)
+no_rows <- round(no_rows * .6)
+
+pushViewport(viewport(layout = grid.layout( 
+  no_rows,
+  no_cols
+)))
+
+rainChar <- function(gp){
+  if (runif(1) > 0.9) {
+    grid.text(sample(0:9, 1), gp = gp)
+  }else{
+    gp$cex = .8
+    as.hexmode(sample(0x30A0:0x30FF, 1))  %>% 
+          as.character() %>% 
+          sprintf("'\\U%s'", .)  %>% 
+          parse(text = .) %>% 
+          grid.text(., gp=gp)
+  }
+}
+
+for (col in 1:no_cols) {
+  rows_2_populate <- sample(round(no_rows*.2):no_rows, 1)
+  for (row in 1:rows_2_populate) {
+    pushViewport(
+      viewport(layout.pos.col = col,
+               layout.pos.row = row)
+    )
+    clr <- "#3bda4c"
+    if (row == rows_2_populate){
+      clr <- "#97fda9"
+      clrs <- colorRampPalette(c("#000000", clr))(sample(8:12, 1))[-1]
+      radius <- seq(from=.5, to=.3, length.out = 5)
+      for (i in 1:5){
+        grid.circle(r = unit(radius[i], "snpc"), gp=gpar(fill = clrs[i], col=NA))
+      }
+    }
+    face <- sample(c("plain", "bold"), size=1, prob=c(.8, .2))
+    gp <- gpar(fontfamily="mono", 
+               fontface=face,
+               col= clr)
+    rainChar(gp)
+    upViewport()
+  }
+  
+  # Do dark rows
+  if (no_rows - rows_2_populate > no_rows*.2) {
+    for (row in round(rows_2_populate + no_rows*.2):no_rows) {
+      pushViewport(
+        viewport(layout.pos.col = col,
+                 layout.pos.row = row)
+      )
+      gp <- gpar(fontfamily="mono", 
+                 fontface="plain",
+                 col= "#2B4830")
+      rainChar(gp)
+      upViewport()
+    }
+  }
+}
+upViewport()
+```
 
 What is the `grid` pacakge?
 ========================================================
-
-```{r setup, include=FALSE}
-opts_chunk$set(cache=TRUE)
-```
 
 Author: Paul Murrell
 Part of the 14 base pacakges.
@@ -71,7 +183,7 @@ transitions$render()
 
 Basics
 ========================================================
-class: small-code
+class: small-text
 
 Everything is arranged around viewports. A viewport has:
 
@@ -101,12 +213,11 @@ upViewport()
 
 Viewports 4 subelements - why?
 ========================================================
-class: small-code
+class: small-text
 
 Adding text to boxes without viewports:
 
 ```{r basic_w_txt, echo=TRUE, eval=FALSE}
-library(grid)
 grid.newpage()
 pushViewport(viewport(x=.5, y=.5, width=.9, height=.9))
 grid.rect(gp = gpar(fill="steelblue"))
@@ -137,11 +248,11 @@ upViewport()
 
 Viewports 4 subelements - how?
 ========================================================
+class: small-text
 
 Adding text to boxes with viewports:
 
 ```{r basic_w_txt_and_vp, echo=TRUE, eval=FALSE}
-library(grid)
 grid.newpage()
 pushViewport(viewport(x=.5, y=.5, width=.9, height=.9))
 grid.rect(gp = gpar(fill="steelblue"))
@@ -172,7 +283,7 @@ upViewport()
 
 Viewports allow encapsulating
 ========================================================
-class: small-code
+class: tiny-code
 
 ```{r basic_encaps, echo=TRUE, eval=FALSE}
 box <- function(box_label,
@@ -213,12 +324,12 @@ upViewport()
 
 Encapsulating side benefits
 ========================================================
-class: small-code
+class: tiny-code
 
 ```{r encaps_side, echo=TRUE, eval=FALSE}
 boxFancy <- function(box_label,
-                x, y, height, width,
-                just) {
+                     x, y, height, width,
+                     just) {
   pushViewport(
     viewport(x=x, y=y, 
              width=width, height,
@@ -226,19 +337,218 @@ boxFancy <- function(box_label,
   
   grid.rect(gp = gpar(fill="lightyellow"))
   grid.text(box_label,
-             gp=gpar(cex=5))
+            gp=gpar(cex=3))
+  width = convertUnit(unit(1, "npc"), "cm")
+  pushViewport(viewport(x = 0, y=0, just=c(0,0), 
+                        width=.5, clip="on"))
+  grid.rect(gp=gpar(fill="yellow", col=NA))
+  grid.text(box_label, 
+            gp=gpar(cex=3, col="red"),
+            vp=viewport(width = width, x=0,y=0, 
+                        just=c(0,0)))
+  upViewport()
+  grid.rect(gp = gpar(fill=NA))
   upViewport()
 }
 
 library(grid)
 grid.newpage()
-box("Some random text",
-    x=0.5, y=0.5, 
-    width=unit(.8, "npc"), height=unit(.8, "npc"),
-    just=c(0.5,0.5))
+boxFancy("Some random text",
+         x=0.5, y=0.5, 
+         width=unit(.8, "npc"), height=unit(.8, "npc"),
+         just=c(0.5,0.5))
 ```
 
 ***
 
 ```{r, ref.label="encaps_side", eval=TRUE, echo=FALSE}
 ```
+
+Core parts 4 a flowchart
+========================================================
+class: small-code
+
+```{r flowchrt_core1, eval=FALSE, echo=TRUE}
+library(Gmisc)
+grid.newpage()
+pushViewport(vp = viewport(gp = gpar(cex = 2)))
+box <- list(
+  boxGrob("This box autosizes to the\ntext within", 
+          y=unit(.95, "npc"), bjust="top"),
+  boxPropGrob("This box can show a porportion", 
+              label_left = "Left",
+              label_right = "Right",
+              prop=.3,
+              y=unit(0.05, "npc"), bjust="bottom"))
+lapply(box, grid.draw)
+```
+
+***
+
+```{r, ref.label="flowchrt_core1", eval=TRUE, echo=FALSE, results='hide'}
+```
+
+Core parts 4 a flowchart - positions
+========================================================
+class: small-code
+
+```{r flowchrt_core2, eval=FALSE, echo=TRUE, }
+grid.newpage()
+pushViewport(vp = viewport(gp = gpar(cex = 2)))
+lapply(box, grid.draw)
+draw_coords <- function(box)
+  with(attr(box, "coords"), {
+    grd_circ <- function(x,y,fill)
+      grid.circle(x=x, y=y, gp=gpar(fill=fill),
+                  r=unit(2, "mm"))
+    grd_circ(x=x, y=y, "black")
+    grd_circ(x=x, y=top, "yellow")
+    grd_circ(x=x, y=bottom, "yellow")
+    grd_circ(x=left, y=y, "orange")
+    grd_circ(x=right, y=y, "orange")
+    if ("left_x" %in% ls()) {
+      grd_circ(x=left_x, y=top, "blue")
+      grd_circ(x=left_x, y=bottom, "blue")
+      grd_circ(x=right_x, y=top, "purple")
+      grd_circ(x=right_x, y=bottom, "purple")
+    }
+  })
+lapply(box, draw_coords)
+```
+
+***
+
+```{r, ref.label="flowchrt_core2", eval=TRUE, echo=FALSE, results='hide'}
+```
+
+
+flowchart - connect
+========================================================
+class: small-code
+
+```{r flowchrt_connect1, eval=FALSE, echo=TRUE, }
+grid.newpage()
+pushViewport(
+  vp=viewport(gp=gpar(cex=2)))
+
+lapply(box, grid.draw)
+lapply(box, draw_coords)
+
+connectGrob(start=box[[1]], 
+            end=box[[2]],
+            type="v")
+```
+
+***
+
+```{r, ref.label="flowchrt_connect1", eval=TRUE, echo=FALSE, results='hide'}
+```
+
+flowchart - connect to prop
+========================================================
+class: small-code
+
+```{r flowchrt_connect2, eval=FALSE, echo=TRUE, }
+grid.newpage()
+pushViewport(
+  vp=viewport(gp=gpar(cex=2)))
+
+lapply(box, grid.draw)
+lapply(box, draw_coords)
+
+connectGrob(start=box[[1]], 
+            end=box[[2]],
+            type="v", 
+            subelmnt="left")
+
+connectGrob(start=box[[1]], 
+            end=box[[2]],
+            type="v", 
+            subelmnt="right")
+```
+
+***
+
+```{r, ref.label="flowchrt_connect2", eval=TRUE, echo=FALSE, results='hide'}
+```
+
+
+Finally a flowchart
+========================================================
+class: tiny-code
+
+```{r flowchrt_example1, eval=FALSE, echo=TRUE, }
+grid.newpage()
+distance <- unit(.2, "npc")
+boxs <- list()
+boxs$start_pop <- boxGrob("Start pop.\nn = 145 patients", y=1, bjust="top")
+boxs$included <- 
+  boxGrob("Included n = 78 patients", bjust="top",
+          y=attr(boxs$start_pop, "coords")$bottom - distance)
+boxs$excluded <- 
+  boxGrob("Excluded:\n - 40 CHF\n - 7 prev. hist.\n - 20 misc.", 
+          y=attr(boxs$start_pop, "coords")$bottom - unit(.1, "npc"),
+          x=1, bjust="right", just="left")
+boxs$groups <- 
+  boxPropGrob("Randomized", 
+              label_left=sprintf("Treatment\n %d patients",
+                                   round(78*.3)),
+              label_right=sprintf("Control\n %d patients",
+                                    78 - round(78*.3)),
+              prop=.3, bjust="top",
+              y=attr(boxs$included, "coords")$bottom - distance)
+boxs$fup_trtmnt <- 
+  with(attr(boxs$groups, "coords"),
+       boxGrob("Treatment 1 year: \n - 1 patients died",
+               x=left_x,
+               bjust="bottom", y=0))
+boxs$fup_control <- 
+  with(attr(boxs$groups, "coords"),
+       boxGrob("Controls 1 year: \n - 2 patients died",
+               x=right_x,
+               bjust="bottom", y=0))
+lapply(boxs, grid.draw)
+```
+
+***
+
+```{r, ref.label="flowchrt_example1", eval=TRUE, echo=FALSE, results='hide'}
+```
+
+Finally a flowchart - connecting the dots
+========================================================
+class: small-code
+
+```{r flowchrt_example2, eval=FALSE, echo=TRUE, }
+grid.newpage() 
+lapply(boxs, grid.draw)
+connectGrob(start=boxs$start_pop, end=boxs$included, 
+            type="v")
+connectGrob(start=boxs$start_pop, end=boxs$excluded, 
+            type="L")
+connectGrob(start=boxs$included, end=boxs$groups, 
+            type="v")
+connectGrob(start=boxs$groups, end=boxs$fup_trtmnt, 
+            type="v", subelmnt="left")
+connectGrob(start=boxs$groups, end=boxs$fup_control, 
+            type="v", subelmnt="right")
+```
+
+***
+
+```{r, ref.label="flowchrt_example2", eval=TRUE, echo=FALSE, results='hide'}
+```
+
+Summary
+===================================================
+
+* Perfect positioning
+* Encapsulate into grobs
+* Build complexity within viewports
+* Sky is the limit
+
+***
+
+```{r, ref.label="digitalRain", echo=FALSE, eval=TRUE}
+```
+
