@@ -47,11 +47,11 @@ autosize: true
 
 <img src="SRUG-meetup-figure/digitalRain-1.png" title="plot of chunk digitalRain" alt="plot of chunk digitalRain" width="1600px" height="600px" />
 
-What is the `grid` pacakge?
+What is the `grid` package?
 ========================================================
 
 Author: Paul Murrell
-Part of the 14 base pacakges.
+Part of the 14 base packages.
 
 > Grid graphics provides an alternative to the standard R graphics. The user is able to define arbitrary rectangular regions (called viewports) on the graphics device and define a number of coordinate systems for each region. Drawing can be specified to occur in any viewport using any of the available coordinate systems.
 
@@ -65,9 +65,9 @@ What makes `grid` great?
 
 &nbsp;
 
-- Perfect control over the over ouptut
+- Perfect control over the over output
 - Your imagination sets the limit
-- Code professional infographics
+- Code professional info-graphics
 
 ***
 
@@ -103,7 +103,7 @@ upViewport()
 ![plot of chunk unnamed-chunk-2](SRUG-meetup-figure/unnamed-chunk-2-1.png)
 
 
-Viewports 4 subelements - why?
+Viewports 4 sub-elements - why?
 ========================================================
 class: small-text
 
@@ -135,10 +135,10 @@ upViewport()
 
 ### What about:
 
-* Resizing?
+* Re-sizing?
 * Component isolation?
 
-Viewports 4 subelements - how?
+Viewports 4 sub-elements - how?
 ========================================================
 class: small-text
 
