@@ -428,7 +428,78 @@ connectGrob(start=boxs$groups, end=boxs$fup_control,
 
 ***
 
-![plot of chunk unnamed-chunk-11](SRUG-meetup-figure/unnamed-chunk-11-1.png)
+![plot of chunk flwchrt_2](SRUG-meetup-figure/flwchrt_2-1.png)
+
+
+Smoothness is fiction part 1
+===================================================
+class: small-code
+
+
+```r
+grid.newpage()
+no_points <- c(100)
+clrs <- colorRampPalette(c("darkred", "darkblue"))(length(no_points))
+for (i in length(no_points):1) {
+  l <- 
+    data.frame(x = c(.1, -.1, .6, 1),
+               y = c(.9, -.5, 0, 1)) %>% 
+    gnrlBezierPoints(length_out = no_points[i])
+  grid.lines(l[,1], l[,2], 
+             gp=gpar(col=clrs[i], lwd = 4))
+}
+```
+
+***
+
+![plot of chunk smoothplot1](SRUG-meetup-figure/smoothplot1-1.png)
+
+
+Smoothness is fiction part 2
+===================================================
+class: small-code
+
+
+```r
+grid.newpage()
+no_points <- c(100, 10)
+clrs <- colorRampPalette(c("darkred", "darkblue"))(length(no_points))
+for (i in length(no_points):1) {
+  l <- 
+    data.frame(x = c(.1, -.1, .6, 1),
+               y = c(.9, -.5, 0, 1)) %>% 
+    gnrlBezierPoints(length_out = no_points[i])
+  grid.lines(l[,1], l[,2], 
+             gp=gpar(col=clrs[i], lwd = 4))
+}
+```
+
+***
+
+![plot of chunk smoothplot2](SRUG-meetup-figure/smoothplot2-1.png)
+
+Smoothness is fiction part 3
+===================================================
+class: small-code
+
+
+```r
+grid.newpage()
+no_points <- c(100, 10, 5)
+clrs <- colorRampPalette(c("darkred", "darkblue"))(length(no_points))
+for (i in length(no_points):1) {
+  l <- 
+    data.frame(x = c(.1, -.1, .6, 1),
+               y = c(.9, -.5, 0, 1)) %>% 
+    gnrlBezierPoints(length_out = no_points[i])
+  grid.lines(l[,1], l[,2], 
+             gp=gpar(col=clrs[i], lwd = 4))
+}
+```
+
+***
+
+![plot of chunk smoothplot3](SRUG-meetup-figure/smoothplot3-1.png)
 
 Summary
 ===================================================
@@ -440,5 +511,5 @@ Summary
 
 ***
 
-![plot of chunk unnamed-chunk-12](SRUG-meetup-figure/unnamed-chunk-12-1.png)
+![plot of chunk unnamed-chunk-11](SRUG-meetup-figure/unnamed-chunk-11-1.png)
 

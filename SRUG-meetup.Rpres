@@ -536,7 +536,78 @@ connectGrob(start=boxs$groups, end=boxs$fup_control,
 
 ***
 
-```{r, ref.label="flowchrt_example2", eval=TRUE, echo=FALSE, results='hide'}
+```{r flwchrt_2, ref.label="flowchrt_example2", eval=TRUE, echo=FALSE, results='hide'}
+```
+
+
+Smoothness is fiction part 1
+===================================================
+class: small-code
+
+```{r Smoothness1, eval=FALSE}
+grid.newpage()
+no_points <- c(100)
+clrs <- colorRampPalette(c("darkred", "darkblue"))(length(no_points))
+for (i in length(no_points):1) {
+  l <- 
+    data.frame(x = c(.1, -.1, .6, 1),
+               y = c(.9, -.5, 0, 1)) %>% 
+    gnrlBezierPoints(length_out = no_points[i])
+  grid.lines(l[,1], l[,2], 
+             gp=gpar(col=clrs[i], lwd = 4))
+}
+```
+
+***
+
+```{r smoothplot1, ref.label="Smoothness1", eval=TRUE, echo=FALSE, results='hide'}
+```
+
+
+Smoothness is fiction part 2
+===================================================
+class: small-code
+
+```{r Smoothness2, eval=FALSE}
+grid.newpage()
+no_points <- c(100, 10)
+clrs <- colorRampPalette(c("darkred", "darkblue"))(length(no_points))
+for (i in length(no_points):1) {
+  l <- 
+    data.frame(x = c(.1, -.1, .6, 1),
+               y = c(.9, -.5, 0, 1)) %>% 
+    gnrlBezierPoints(length_out = no_points[i])
+  grid.lines(l[,1], l[,2], 
+             gp=gpar(col=clrs[i], lwd = 4))
+}
+```
+
+***
+
+```{r smoothplot2, ref.label="Smoothness2", eval=TRUE, echo=FALSE, results='hide'}
+```
+
+Smoothness is fiction part 3
+===================================================
+class: small-code
+
+```{r Smoothness3, eval=FALSE}
+grid.newpage()
+no_points <- c(100, 10, 5)
+clrs <- colorRampPalette(c("darkred", "darkblue"))(length(no_points))
+for (i in length(no_points):1) {
+  l <- 
+    data.frame(x = c(.1, -.1, .6, 1),
+               y = c(.9, -.5, 0, 1)) %>% 
+    gnrlBezierPoints(length_out = no_points[i])
+  grid.lines(l[,1], l[,2], 
+             gp=gpar(col=clrs[i], lwd = 4))
+}
+```
+
+***
+
+```{r smoothplot3, ref.label="Smoothness3", eval=TRUE, echo=FALSE, results='hide'}
 ```
 
 Summary
